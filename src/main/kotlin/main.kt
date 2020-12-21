@@ -14,10 +14,14 @@ fun main(args: Array<String>) {
     }
 
     var index = 0
-    while (!visitedIndexes.contains(index)) {
+    while (!visitedIndexes.contains(index) && index < instructions.size) {
         visitedIndexes.add(index)
         index = eval(instructions[index]!!, index)
     }
+    if (visitedIndexes.contains(index)) {
+        println("infinite loop")
+    }
+    println(index)
     println(accumulator)
 }
 
@@ -25,6 +29,7 @@ fun eval(command: String, index: Int): Int {
     val data = command.split(" ")
     when {
         data[0] == "nop" -> {
+            println("nop index: $index")
             return index + 1
         }
         data[0] == "acc" -> {
@@ -37,6 +42,7 @@ fun eval(command: String, index: Int): Int {
             return index + 1
         }
         data[0] == "jmp" -> {
+            println("jmp index: $index")
             val num = data[1].toCharArray()
             if (num[0] == '+') {
                 return index + data[1].replace("+", "").toInt()
