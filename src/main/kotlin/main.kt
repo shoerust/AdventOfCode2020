@@ -1,47 +1,65 @@
 import java.io.File
-import kotlin.math.abs
 
+//vibrant plum bags contain 5 faded blue bags, 6 dotted black bags.
+var regex = """([\w]+\s[\w]+)\sbag""".toRegex()
+
+val coloursInner = mutableMapOf<String, Set<String>>()
+val coloursOuter = mutableMapOf<String, Set<String>>()
 fun main(args: Array<String>) {
     println("Hello AdventOfCode2020!")
 
     val fileName = "/Volumes/AsphyxiaSSD/development/advent1/src/main/resources/input.txt"
     val lines: List<String> = File(fileName).readLines()
-    var idList = mutableListOf<Int>()
-
-    var lineCount = 0
-    var yesQuestions = mutableMapOf<String, Int>()
-    var sum = 0
     for (line in lines) {
-        if (line.isNotBlank()) {
-            lineCount++
-            for (q in line) {
-                if (yesQuestions.containsKey(q.toString())) {
-                    yesQuestions[q.toString()] = yesQuestions[q.toString()]!!.plus(1)
-                } else {
-                    yesQuestions[q.toString()] = 1
-                }
+        val work = line.replace("bags", "bag")
+        val data = work.split(" contain ")
+        val keyResult = regex.find(data[0])
+        var (key) = keyResult!!.destructured
+        key = key.replace("bag", "").trim()
+        if (!coloursInner.containsKey(key)) {
+            coloursInner[key] = mutableSetOf<String>()
+        }
+        
+        var matchResult = regex.find(data[1])
+        while (matchResult != null) {
+            val d = matchResult.value.replace("bag", "").trim()
+            if (!d.contains("no other")) {
+                val test = mutableSetOf<String>()
+                test.addAll(coloursInner[key]!!)
+                test.add(d)
+                coloursInner[key] = test
             }
-        } else {
-            val temp = mutableMapOf<String, Int>()
-            temp.putAll(yesQuestions)
-            for (pair in yesQuestions) {
-                if (pair.value == lineCount) {
-                    temp.remove(pair.key)
-                }
-            }
-            sum += yesQuestions.size - temp.size
-            lineCount = 0
-            yesQuestions = mutableMapOf<String, Int>()
+            matchResult = matchResult.next()
+
         }
     }
-    val temp = mutableMapOf<String, Int>()
-    temp.putAll(yesQuestions)
-    for (pair in yesQuestions) {
-        if (pair.value == lineCount) {
-            temp.remove(pair.key)
+    println("ColoursInner: $coloursInner")
+    for (pair in coloursInner) {
+        val key = pair.key
+        for (v in pair.value) {
+            if (coloursOuter.containsKey(v)) {
+                val test = mutableSetOf<String>()
+                test.addAll(coloursOuter[v]!!)
+                test.add(key)
+                coloursOuter[v] = test
+            } else {
+                coloursOuter[v] = mutableSetOf<String>(key)
+            }
         }
     }
-    sum += yesQuestions.size - temp.size
-    lineCount = 0
-    println(sum)
+    println("ColoursOuter: $coloursOuter")
+
+    totalOuter("shiny gold")
+    println(colours.size)
+
+}
+
+var colours = mutableSetOf<String>()
+fun totalOuter(name: String) {
+    if (coloursOuter.containsKey(name)) {
+        for (b in coloursOuter[name]!!) {
+            totalOuter(b)
+        }
+        coloursOuter[name]?.let { colours.addAll(it) }
+    }
 }
