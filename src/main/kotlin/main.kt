@@ -6,74 +6,42 @@ fun main(args: Array<String>) {
 
     val fileName = "/Volumes/AsphyxiaSSD/development/advent1/src/main/resources/input.txt"
     val lines: List<String> = File(fileName).readLines()
-    var maxSeatId = 0
     var idList = mutableListOf<Int>()
+
+    var lineCount = 0
+    var yesQuestions = mutableMapOf<String, Int>()
+    var sum = 0
     for (line in lines) {
-       val seatId = calculateSeatId(line)
-        idList.add(seatId)
-       if (seatId > maxSeatId) {
-           maxSeatId = seatId
-       }
-    }
-    println(maxSeatId)
-    idList.sort()
-    var previousId = -1
-    for (id in idList) {
-        previousId = if (previousId == -1) {
-            id
+        if (line.isNotBlank()) {
+            lineCount++
+            for (q in line) {
+                if (yesQuestions.containsKey(q.toString())) {
+                    yesQuestions[q.toString()] = yesQuestions[q.toString()]!!.plus(1)
+                } else {
+                    yesQuestions[q.toString()] = 1
+                }
+            }
         } else {
-            if (id == (previousId + 2)) {
-                println("Id: $id")
+            val temp = mutableMapOf<String, Int>()
+            temp.putAll(yesQuestions)
+            for (pair in yesQuestions) {
+                if (pair.value == lineCount) {
+                    temp.remove(pair.key)
+                }
             }
-            id
+            sum += yesQuestions.size - temp.size
+            lineCount = 0
+            yesQuestions = mutableMapOf<String, Int>()
         }
     }
-}
-
-
-fun calculateSeatId(line: String): Int {
-    var rowMax = 127
-    var rowMin = 0
-    var seatMax = 7
-    var seatMin = 0
-    var useRowMin = false
-    var useSeatMin = false
-    var finalRow = 0
-    var finalSeat = 0
-    for (direction in line) {
-        when (direction) {
-            'F' -> {
-                rowMax -= ((rowMax - rowMin) / 2) + 1
-                useRowMin = true
-            }
-            'B' -> {
-                rowMin += ((rowMax - rowMin) / 2) + 1
-                useRowMin = false
-            }
-            'R' -> {
-                seatMin += ((seatMax - seatMin) / 2) + 1
-                useSeatMin = false
-            }
-            'L' -> {
-                seatMax -= ((seatMax - seatMin) / 2) + 1
-                useSeatMin = true
-            }
+    val temp = mutableMapOf<String, Int>()
+    temp.putAll(yesQuestions)
+    for (pair in yesQuestions) {
+        if (pair.value == lineCount) {
+            temp.remove(pair.key)
         }
     }
-    println(line)
-    println("$rowMax $rowMin $seatMax $seatMin")
-    finalRow = if (useRowMin) {
-        rowMin
-    } else {
-        rowMax
-    }
-    finalSeat = if (useSeatMin) {
-        seatMin
-    } else {
-        seatMax
-    }
-    println("$finalRow $finalSeat")
-    val id = finalRow * 8 + finalSeat
-    println(id)
-    return id
+    sum += yesQuestions.size - temp.size
+    lineCount = 0
+    println(sum)
 }
