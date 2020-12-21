@@ -1,41 +1,89 @@
 import java.io.File
 
+val regex = """(.+):(.+)""".toRegex()
+val requiredKeys = setOf<String>("byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid")
+val cmRegex = """([0-9]+)cm""".toRegex()
+val inchRegex = """([0-9]+)in""".toRegex()
+val colorRegex = """#([0-9]|[a-f]){6}""".toRegex()
+val eyeRegex = """^(amb|blu|brn|gry|grn|hzl|oth)${'$'}""".toRegex()
+val pidRegex = """[0-9]{9}""".toRegex()
 fun main(args: Array<String>) {
-    println("Hello World!")
+    println("Hello AdventOfCode2020!")
+
     val fileName = "/Volumes/AsphyxiaSSD/development/advent1/src/main/resources/input.txt"
     val lines: List<String> = File(fileName).readLines()
-    val trees: Long
-    val trees2 = evalSlope(lines, 3, 1)
-    val trees3 = evalSlope(lines, 1, 1)
-    val trees4 = evalSlope(lines, 5, 1)
-    val trees5 = evalSlope(lines, 7, 1)
-    val trees6 = evalSlope(lines, 1, 2)
-    trees = trees2 * trees3 * trees4 * trees5 * trees6
-    println(trees)
-}
-
-fun evalSlope(lines: List<String>, right: Int, down: Int): Long {
-    var position = 0
-    var trees = 0L
-    var downCounter = 0
-    lines.forEach { line -> run {
-        if (downCounter == 0 || downCounter % down == 0) {
-            if (position >= line.length) {
-                position -= line.length
+    var validPassports = 0
+    var passport = ""
+    var rk = mutableSetOf<String>()
+    for (line in lines) {
+        if (line.isNotBlank()) {
+            passport += " $line"
+        } else {
+            rk = validate(passport.trim())
+            if (rk.isEmpty()) {
+                validPassports++
             }
-            if (isTree(line, position)) {
-                trees++
-            }
-            position += right
+            passport = ""
         }
-        downCounter++
-    } }
-    return trees
+    }
+    if (rk.isEmpty()) {
+        validPassports++
+    }
+    println(validPassports)
 }
 
-fun isTree(line: String, pos: Int): Boolean {
-    if (line.toCharArray()[pos] == '#') {
-        return true
+fun validate(passport: String): MutableSet<String> {
+
+    val temp = mutableSetOf<String>()
+    temp.addAll(requiredKeys)
+
+    val pairs = passport.split(" ")
+    for (pair in pairs) {
+        val match = regex.find(pair)
+        val (key, value) = match!!.destructured
+        if (requiredKeys.contains(key)) {
+            if (key == "byr") {
+              if (value.toInt() in 1920..2002) {
+                  temp.remove(key)
+              }
+            } else if (key == "iyr") {
+                if (value.toInt() in 2010..2020) {
+                    temp.remove(key)
+                }
+            } else if (key == "eyr") {
+                if (value.toInt() in 2020..2030) {
+                    temp.remove(key)
+                }
+            } else if (key == "hgt") {
+                val cm = cmRegex.find(value)
+                if (cm != null) {
+                    val (number) = cm.destructured
+                    if (number.toInt() in 150..193) {
+                        temp.remove(key)
+                    }
+                } else {
+                    val inch = inchRegex.find(value)
+                    if (inch != null) {
+                        val (number) = inch.destructured
+                        if (number.toInt() in 59..76) {
+                            temp.remove(key)
+                        }
+                    }
+                }
+            } else if (key == "hcl") {
+                if (colorRegex.matches(value)) {
+                    temp.remove(key)
+                }
+            } else if (key == "ecl") {
+               if (eyeRegex.matches(value)) {
+                   temp.remove(key)
+               }
+            } else if (key == "pid") {
+              if (pidRegex.matches(value)) {
+                  temp.remove(key)
+              }
+            }
+        }
     }
-    return false
+    return temp
 }
