@@ -1,84 +1,55 @@
 import java.io.File
 
-//vibrant plum bags contain 5 faded blue bags, 6 dotted black bags.
-var regex = """([\w]+\s[\w]+)\sbag""".toRegex()
-var numberRegex = """([0-9]+\s[\w]+\s[\w]+)\sbag""".toRegex()
-
-val coloursInner = mutableMapOf<String, Set<String>>()
-val coloursOuter = mutableMapOf<String, Set<String>>()
+var accumulator = 0
+val visitedIndexes = mutableSetOf<Int>()
 fun main(args: Array<String>) {
     println("Hello AdventOfCode2020!")
 
     val fileName = "/Volumes/AsphyxiaSSD/development/advent1/src/main/resources/input.txt"
     val lines: List<String> = File(fileName).readLines()
-    for (line in lines) {
-        val work = line.replace("bags", "bag")
-        val data = work.split(" contain ")
-        val keyResult = regex.find(data[0])
-        var (key) = keyResult!!.destructured
-        key = key.replace("bag", "").trim()
-        if (!coloursInner.containsKey(key)) {
-            coloursInner[key] = mutableSetOf<String>()
-        }
-        
-        var matchResult = numberRegex.find(data[1])
-        while (matchResult != null) {
-            val d = matchResult.value.replace("bag", "").trim()
-            if (!d.contains("no other")) {
-                val test = mutableSetOf<String>()
-                test.addAll(coloursInner[key]!!)
-                test.add(d)
-                coloursInner[key] = test
-            }
-            matchResult = matchResult.next()
+    val instructions = mutableMapOf<Int, String>()
 
-        }
+    for ((index, line) in lines.withIndex()) {
+        instructions[index] = line
     }
-    println("ColoursInner: $coloursInner")
-    for (pair in coloursInner) {
-        val key = pair.key
-        for (v in pair.value) {
-            if (coloursOuter.containsKey(v)) {
-                val test = mutableSetOf<String>()
-                test.addAll(coloursOuter[v]!!)
-                test.add(key)
-                coloursOuter[v] = test
-            } else {
-                coloursOuter[v] = mutableSetOf<String>(key)
-            }
-        }
+
+    var index = 0
+    while (!visitedIndexes.contains(index)) {
+        visitedIndexes.add(index)
+        index = eval(instructions[index]!!, index)
     }
-    println("ColoursOuter: $coloursOuter")
-
-    totalOuter("shiny gold")
-    println(colours.size)
-
-    totalInner("shiny gold")
-    println(totalInnerColours.size)
-    println(total)
+    println(accumulator)
 }
 
-var totalInnerColours = mutableListOf<String>()
-var total = -1
-fun totalInner(name: String) {
-    if (coloursInner.containsKey(name)) {
-        for (b in coloursInner[name]!!) {
-            val t = b.split(" ")
-            val num = t[0].toInt()
-            for (i in 1..num) {
-                totalInner(t[1] + " " + t[2])
-            }
+fun eval(command: String, index: Int): Int {
+    val data = command.split(" ")
+    when {
+        data[0] == "nop" -> {
+            return index + 1
         }
-        total++
+        data[0] == "acc" -> {
+            val num = data[1].toCharArray()
+            if (num[0] == '+') {
+                accumulator += data[1].replace("+", "").toInt()
+            } else if (num[0] == '-') {
+                accumulator -= data[1].replace("-", "").toInt()
+            }
+            return index + 1
+        }
+        data[0] == "jmp" -> {
+            val num = data[1].toCharArray()
+            if (num[0] == '+') {
+                return index + data[1].replace("+", "").toInt()
+            } else if (num[0] == '-') {
+                return index - data[1].replace("-", "").toInt()
+            }
+            println("no jmp :(")
+            return index
+        }
+        else -> {
+            println("can't handle that command :(")
+            return 0
+        }
     }
 }
 
-var colours = mutableSetOf<String>()
-fun totalOuter(name: String) {
-    if (coloursOuter.containsKey(name)) {
-        for (b in coloursOuter[name]!!) {
-            totalOuter(b)
-        }
-        coloursOuter[name]?.let { colours.addAll(it) }
-    }
-}
