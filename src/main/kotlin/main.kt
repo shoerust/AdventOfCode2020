@@ -2,6 +2,7 @@ import java.io.File
 
 //vibrant plum bags contain 5 faded blue bags, 6 dotted black bags.
 var regex = """([\w]+\s[\w]+)\sbag""".toRegex()
+var numberRegex = """([0-9]+\s[\w]+\s[\w]+)\sbag""".toRegex()
 
 val coloursInner = mutableMapOf<String, Set<String>>()
 val coloursOuter = mutableMapOf<String, Set<String>>()
@@ -20,7 +21,7 @@ fun main(args: Array<String>) {
             coloursInner[key] = mutableSetOf<String>()
         }
         
-        var matchResult = regex.find(data[1])
+        var matchResult = numberRegex.find(data[1])
         while (matchResult != null) {
             val d = matchResult.value.replace("bag", "").trim()
             if (!d.contains("no other")) {
@@ -52,6 +53,24 @@ fun main(args: Array<String>) {
     totalOuter("shiny gold")
     println(colours.size)
 
+    totalInner("shiny gold")
+    println(totalInnerColours.size)
+    println(total)
+}
+
+var totalInnerColours = mutableListOf<String>()
+var total = -1
+fun totalInner(name: String) {
+    if (coloursInner.containsKey(name)) {
+        for (b in coloursInner[name]!!) {
+            val t = b.split(" ")
+            val num = t[0].toInt()
+            for (i in 1..num) {
+                totalInner(t[1] + " " + t[2])
+            }
+        }
+        total++
+    }
 }
 
 var colours = mutableSetOf<String>()
