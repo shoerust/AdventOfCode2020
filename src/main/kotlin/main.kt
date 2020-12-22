@@ -53,50 +53,6 @@ fun main(args: Array<String>) {
     println("x: ${Ship.x}, y: ${Ship.y}, result: $result")
 }
 
-fun rotateLeft(value: Long) {
-    var newX = 0L
-    var newY = 0L
-    when (value) {
-        90L -> {
-            newX = -(Waypoint.y - Ship.y)
-            newY = (Waypoint.x - Ship.x)
-        }
-        180L -> {
-            newX = -(Waypoint.y - Ship.y)
-            newY = -(Waypoint.x - Ship.x)
-        }
-        270L -> {
-            newX = (Waypoint.y - Ship.y)
-            newY = -(Waypoint.x - Ship.x)
-        }
-    }
-    Waypoint.x = Ship.x + newX
-    Waypoint.y = Ship.y + newY
-    println("L$value wx: ${Waypoint.x} wy: ${Waypoint.y} sx: ${Ship.x} sy: ${Ship.y}")
-}
-
-fun rotateRight(value: Long) {
-    var newX = 0L
-    var newY = 0L
-    when (value) {
-        90L -> {
-            newX = (Waypoint.y - Ship.y)
-            newY = -(Waypoint.x - Ship.x)
-        }
-        180L -> {
-            newX = -(Waypoint.y - Ship.y)
-            newY = -(Waypoint.x - Ship.x)
-        }
-        270L -> {
-            newX = -(Waypoint.y - Ship.y)
-            newY = (Waypoint.x - Ship.x)
-        }
-    }
-    Waypoint.x = Ship.x + newX
-    Waypoint.y = Ship.y + newY
-    println("R$value wx: ${Waypoint.x} wy: ${Waypoint.y} sx: ${Ship.x} sy: ${Ship.y}")
-}
-
 object Ship {
     var x = 0L
     var y = 0L
