@@ -9,7 +9,7 @@ fun main(args: Array<String>) {
     for ((index, line) in lines.withIndex()) {
 
         if (index == 0) {
-          timestamp = line.toLong()
+            timestamp = line.toLong()
         } else {
             val buses = line.split(",")
             var shortestWait = timestamp
@@ -26,6 +26,28 @@ fun main(args: Array<String>) {
                 }
             }
             println(shortestWait * ride)
+        }
+    }
+
+    // part2
+    for ((index, line) in lines.withIndex()) {
+
+        if (index == 0) {
+            //ignore
+        } else {
+            val buses = line.split(",")
+            var minValue = 0L
+            var runningProduct = 1L
+            for ((index2, bus) in buses.withIndex()) {
+                if (bus != "x") {
+                    val intBus = bus.toInt()
+                    while ((minValue + index2) % intBus != 0L) {
+                        minValue += runningProduct
+                    }
+                    runningProduct *= intBus
+                }
+            }
+            println(minValue)
         }
     }
 }
