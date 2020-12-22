@@ -17,7 +17,7 @@ fun main(args: Array<String>) {
         plan.add(listLine)
     }
     var iterations = 0
-    while(updateSeats()) {
+    while (updateSeats()) {
         iterations++
     }
     println(plan)
@@ -35,36 +35,92 @@ fun updateSeats(): Boolean {
     for ((indexR, a) in plan.withIndex()) {
         for ((indexC, b) in a.withIndex()) {
             var surroundingOccupied = 0
-            if (isOccupied(indexR, indexC + 1)) {
+            var seen = false
+            var counter = 0
+            while (!seen) {
+                counter++
+                seen = isChair(indexR, indexC + counter)
+            }
+            if (isOccupied(indexR, indexC + counter)) {
                 surroundingOccupied++
             }
-            if (isOccupied(indexR, indexC - 1)) {
+
+            seen = false
+            counter = 0
+            while (!seen) {
+                counter++
+                seen = isChair(indexR, indexC - counter)
+            }
+            if (isOccupied(indexR, indexC - counter)) {
                 surroundingOccupied++
             }
-            if (isOccupied(indexR + 1, indexC)) {
+
+            seen = false
+            counter = 0
+            while (!seen) {
+                counter++
+                seen = isChair(indexR + counter, indexC)
+            }
+            if (isOccupied(indexR + counter, indexC)) {
                 surroundingOccupied++
             }
-            if (isOccupied(indexR - 1, indexC)) {
+
+            seen = false
+            counter = 0
+            while (!seen) {
+                counter++
+                seen = isChair(indexR - counter, indexC)
+            }
+            if (isOccupied(indexR - counter, indexC)) {
                 surroundingOccupied++
             }
-            if (isOccupied(indexR - 1, indexC - 1)) {
+
+            seen = false
+            counter = 0
+            while (!seen) {
+                counter++
+                seen = isChair(indexR - counter, indexC - counter)
+            }
+            if (isOccupied(indexR - counter, indexC - counter)) {
                 surroundingOccupied++
             }
-            if (isOccupied(indexR + 1, indexC + 1)) {
+
+            seen = false
+            counter = 0
+            while (!seen) {
+                counter++
+                seen = isChair(indexR + counter, indexC + counter)
+            }
+            if (isOccupied(indexR + counter, indexC + counter)) {
                 surroundingOccupied++
             }
-            if (isOccupied(indexR - 1, indexC + 1)) {
+
+            seen = false
+            counter = 0
+            while (!seen) {
+                counter++
+                seen = isChair(indexR - counter, indexC + counter)
+            }
+            if (isOccupied(indexR - counter, indexC + counter)) {
                 surroundingOccupied++
             }
-            if (isOccupied(indexR + 1, indexC - 1)) {
+
+            seen = false
+            counter = 0
+            while (!seen) {
+                counter++
+                seen = isChair(indexR + counter, indexC - counter)
+            }
+            if (isOccupied(indexR + counter, indexC - counter)) {
                 surroundingOccupied++
             }
+
             if (plan[indexR][indexC] == 'L') {
                 if (surroundingOccupied == 0) {
                     newPlan[indexR][indexC] = '#'
                 }
             } else if (plan[indexR][indexC] == '#') {
-                if (surroundingOccupied >= 4) {
+                if (surroundingOccupied >= 5) {
                     newPlan[indexR][indexC] = 'L'
                 }
             }
@@ -75,6 +131,14 @@ fun updateSeats(): Boolean {
         return true
     }
     return false
+}
+
+fun isChair(r: Int, c: Int): Boolean {
+    return try {
+        plan[r][c] == 'L' || plan[r][c] == '#'
+    } catch (e: Exception) {
+        true
+    }
 }
 
 fun isOccupied(r: Int, c: Int): Boolean {
@@ -95,5 +159,9 @@ fun countOccupied(): Int {
         }
     }
     return counter
+}
+
+class Floor : Exception() {
+
 }
 
