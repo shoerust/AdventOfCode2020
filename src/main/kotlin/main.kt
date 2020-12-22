@@ -1,72 +1,99 @@
 import java.io.File
+import java.lang.Exception
 
-var oneJolt = 0L
-var threeJolt = 0L
-val data = mutableListOf<Long>()
+
+var plan = mutableListOf<MutableList<Char>>()
 fun main(args: Array<String>) {
     println("Hello AdventOfCode2020!")
 
     val fileName = "/Volumes/AsphyxiaSSD/development/advent1/src/main/resources/input.txt"
     val lines: List<String> = File(fileName).readLines()
 
-    data.add(0)
     for ((index, line) in lines.withIndex()) {
-        data.add(line.toLong())
-    }
-    data.sort()
-    data.add(data.last() + 3)
-
-    val adapters = mutableListOf<Long>()
-
-    for (d in data) {
-        if (adapters.isEmpty()) {
-            if (d <= 3L) {
-                if (d == 1L) {
-                    oneJolt++
-                }
-                if (d == 3L) {
-                    threeJolt++
-                }
-                adapters.add(d)
-            }
-        } else {
-            if (d - adapters.last() <= 3) {
-                if (d - adapters.last() == 1L) {
-                    oneJolt++
-                }
-                if (d - adapters.last() == 3L) {
-                    threeJolt++
-                }
-                adapters.add(d)
-            } else {
-                break
-            }
+        val listLine = mutableListOf<Char>()
+        for (c in line) {
+            listLine.add(c)
         }
+        plan.add(listLine)
     }
-    threeJolt++
-    val result = oneJolt * threeJolt
-    println("Result: $result, One: $oneJolt, Three: $threeJolt")
+    var iterations = 0
+    while(updateSeats()) {
+        iterations++
+    }
+    println(plan)
+    println(iterations)
+    println(countOccupied())
 
-    println("Part 2 -----")
-
-   println(calculate(0))
 }
 
-var memo = mutableMapOf<Int, Long>()
-fun calculate(index: Int): Long {
-    if (index == data.size - 1) {
-        return 1
+fun updateSeats(): Boolean {
+
+    val newPlan = mutableListOf<MutableList<Char>>()
+    for (c in plan) {
+        newPlan.add(c.toMutableList())
     }
-    if (memo.containsKey(index)) {
-        return memo[index]!!
-    }
-    var count = 0L
-    for (j in index+1 until data.size) {
-        if ((data[j] - data[index]) <= 3) {
-            count += calculate(j)
+    for ((indexR, a) in plan.withIndex()) {
+        for ((indexC, b) in a.withIndex()) {
+            var surroundingOccupied = 0
+            if (isOccupied(indexR, indexC + 1)) {
+                surroundingOccupied++
+            }
+            if (isOccupied(indexR, indexC - 1)) {
+                surroundingOccupied++
+            }
+            if (isOccupied(indexR + 1, indexC)) {
+                surroundingOccupied++
+            }
+            if (isOccupied(indexR - 1, indexC)) {
+                surroundingOccupied++
+            }
+            if (isOccupied(indexR - 1, indexC - 1)) {
+                surroundingOccupied++
+            }
+            if (isOccupied(indexR + 1, indexC + 1)) {
+                surroundingOccupied++
+            }
+            if (isOccupied(indexR - 1, indexC + 1)) {
+                surroundingOccupied++
+            }
+            if (isOccupied(indexR + 1, indexC - 1)) {
+                surroundingOccupied++
+            }
+            if (plan[indexR][indexC] == 'L') {
+                if (surroundingOccupied == 0) {
+                    newPlan[indexR][indexC] = '#'
+                }
+            } else if (plan[indexR][indexC] == '#') {
+                if (surroundingOccupied >= 4) {
+                    newPlan[indexR][indexC] = 'L'
+                }
+            }
         }
     }
-    memo[index] = count
-    return count
+    if (!plan.containsAll(newPlan)) {
+        plan = newPlan
+        return true
+    }
+    return false
+}
+
+fun isOccupied(r: Int, c: Int): Boolean {
+    return try {
+        plan[r][c] == '#'
+    } catch (e: Exception) {
+        false
+    }
+}
+
+fun countOccupied(): Int {
+    var counter = 0
+    for ((indexR, a) in plan.withIndex()) {
+        for ((indexC, b) in a.withIndex()) {
+            if (b == '#') {
+                counter++
+            }
+        }
+    }
+    return counter
 }
 
