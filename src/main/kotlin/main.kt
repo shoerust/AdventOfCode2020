@@ -9,181 +9,101 @@ fun main(args: Array<String>) {
     val lines: List<String> = File(fileName).readLines()
 
     for ((index, line) in lines.withIndex()) {
-        var matchResult = regex.find(line)
+        val matchResult = regex.find(line)
         val direction = matchResult!!.groupValues[1]
         val value = matchResult!!.groupValues[2].toLong()
 
         when (direction) {
             "N" -> {
-                Ship.y = Ship.y + value
+                Waypoint.y += value
             }
             "S" -> {
-                Ship.y = Ship.y - value
+                Waypoint.y -= value
             }
             "E" -> {
-                Ship.x = Ship.x + value
+                Waypoint.x += value
             }
             "W" -> {
-                Ship.x = Ship.x - value
+                Waypoint.x -= value
             }
             "L" -> {
-                rotateLeft(value)
+                for (i in 1..value/90) {
+                    val temp = Waypoint.y
+                    Waypoint.y = Waypoint.x
+                    Waypoint.x = temp * -1
+                }
             }
             "R" -> {
-
-                rotateRight(value)
+                for (i in 1..value/90) {
+                    val temp = Waypoint.y
+                    Waypoint.y = Waypoint.x * -1
+                    Waypoint.x = temp
+                }
             }
             "F" -> {
-                when (Ship.direction) {
-                    "N" -> {
-                        Ship.y = Ship.y + value
-                    }
-                    "S" -> {
-                        Ship.y = Ship.y - value
-                    }
-                    "E" -> {
-                        Ship.x = Ship.x + value
-                    }
-                    "W" -> {
-                        Ship.x = Ship.x - value
-                    }
-                }
+                Ship.x += Waypoint.x * value
+                Ship.y += Waypoint.y * value
             }
             else -> {
                 println("wtf")
             }
         }
     }
-    val result = kotlin.math.abs(Ship.x) + kotlin.math.abs(Ship.y)
-    println("x: ${kotlin.math.abs(Ship.x)}, y: ${kotlin.math.abs(Ship.y)}, result: $result")
+    val result = abs(Ship.x) + abs(Ship.y)
+    println("x: ${Ship.x}, y: ${Ship.y}, result: $result")
 }
 
 fun rotateLeft(value: Long) {
+    var newX = 0L
+    var newY = 0L
     when (value) {
         90L -> {
-            when (Ship.direction) {
-                "N" -> {
-                    Ship.direction = "W"
-                }
-                "E" -> {
-                    Ship.direction = "N"
-                }
-                "S" -> {
-                    Ship.direction = "E"
-                }
-                "W" -> {
-                    Ship.direction = "S"
-                }
-            }
+            newX = -(Waypoint.y - Ship.y)
+            newY = (Waypoint.x - Ship.x)
         }
         180L -> {
-            when (Ship.direction) {
-                "N" -> {
-                    Ship.direction = "S"
-                }
-                "E" -> {
-                    Ship.direction = "W"
-                }
-                "S" -> {
-                    Ship.direction = "N"
-                }
-                "W" -> {
-                    Ship.direction = "E"
-                }
-            }
+            newX = -(Waypoint.y - Ship.y)
+            newY = -(Waypoint.x - Ship.x)
         }
         270L -> {
-            when (Ship.direction) {
-                "N" -> {
-                    Ship.direction = "E"
-                }
-                "E" -> {
-                    Ship.direction = "S"
-                }
-                "S" -> {
-                    Ship.direction = "W"
-                }
-                "W" -> {
-                    Ship.direction = "N"
-                }
-            }
+            newX = (Waypoint.y - Ship.y)
+            newY = -(Waypoint.x - Ship.x)
         }
     }
+    Waypoint.x = Ship.x + newX
+    Waypoint.y = Ship.y + newY
+    println("L$value wx: ${Waypoint.x} wy: ${Waypoint.y} sx: ${Ship.x} sy: ${Ship.y}")
 }
 
 fun rotateRight(value: Long) {
+    var newX = 0L
+    var newY = 0L
     when (value) {
         90L -> {
-            when (Ship.direction) {
-                "N" -> {
-                    Ship.direction = "E"
-                }
-                "E" -> {
-                    Ship.direction = "S"
-                }
-                "S" -> {
-                    Ship.direction = "W"
-                }
-                "W" -> {
-                    Ship.direction = "N"
-                }
-            }
+            newX = (Waypoint.y - Ship.y)
+            newY = -(Waypoint.x - Ship.x)
         }
         180L -> {
-            when (Ship.direction) {
-                "N" -> {
-                    Ship.direction = "S"
-                }
-                "E" -> {
-                    Ship.direction = "W"
-                }
-                "S" -> {
-                    Ship.direction = "N"
-                }
-                "W" -> {
-                    Ship.direction = "E"
-                }
-            }
+            newX = -(Waypoint.y - Ship.y)
+            newY = -(Waypoint.x - Ship.x)
         }
         270L -> {
-            when (Ship.direction) {
-                "N" -> {
-                    Ship.direction = "W"
-                }
-                "E" -> {
-                    Ship.direction = "N"
-                }
-                "S" -> {
-                    Ship.direction = "E"
-                }
-                "W" -> {
-                    Ship.direction = "S"
-                }
-            }
+            newX = -(Waypoint.y - Ship.y)
+            newY = (Waypoint.x - Ship.x)
         }
     }
-}
-
-fun move(value: Long, direction: String) {
-    when (direction) {
-        "N" -> {
-            Ship.y = Ship.y + value
-        }
-        "S" -> {
-            Ship.y = Ship.y - value
-        }
-        "E" -> {
-            Ship.x = Ship.x + value
-        }
-        "W" -> {
-            Ship.x = Ship.x - value
-        }
-    }
+    Waypoint.x = Ship.x + newX
+    Waypoint.y = Ship.y + newY
+    println("R$value wx: ${Waypoint.x} wy: ${Waypoint.y} sx: ${Ship.x} sy: ${Ship.y}")
 }
 
 object Ship {
-    var direction = "E"
     var x = 0L
     var y = 0L
+}
+
+object Waypoint {
+    var x = Ship.x + 10L
+    var y = Ship.y + 1L
 }
 
