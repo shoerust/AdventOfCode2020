@@ -5,50 +5,66 @@ fun main(args: Array<String>) {
 
     val fileName = "/Volumes/AsphyxiaSSD/development/advent1/src/main/resources/input.txt"
     val lines: List<String> = File(fileName).readLines()
-    var timestamp = 0L
-    for ((index, line) in lines.withIndex()) {
 
-        if (index == 0) {
-            timestamp = line.toLong()
-        } else {
-            val buses = line.split(",")
-            var shortestWait = timestamp
-            var soonestNo = -1
-            var ride = 0L
-            for (bus in buses) {
-                if (bus != "x") {
-                    val longBus = bus.toLong()
-                    val minutes = longBus - (timestamp % longBus)
-                    if (minutes < shortestWait) {
-                        shortestWait = minutes
-                        ride = longBus
-                    }
-                }
+    var populatePlayer = 1
+
+    var player1Cards = mutableListOf<Int>()
+    var player2Cards = mutableListOf<Int>()
+
+    for ((index, line) in lines.withIndex()) {
+        when {
+            line.isBlank() -> {
+               //skip
             }
-            println(shortestWait * ride)
+            line.contains("Player 1") -> {
+                populatePlayer = 1
+            }
+            line.contains("Player 2") -> {
+                populatePlayer = 2
+            }
+            populatePlayer == 1 -> {
+                player1Cards.add(line.toInt())
+            }
+            populatePlayer == 2 -> {
+                player2Cards.add(line.toInt())
+            }
         }
     }
 
-    // part2
-    for ((index, line) in lines.withIndex()) {
+    var winner = false
+    var rounds = 0
+    while (!winner) {
+        val p1 = player1Cards.first()
+        val p2 = player2Cards.first()
 
-        if (index == 0) {
-            //ignore
+        player1Cards.remove(p1)
+        player2Cards.remove(p2)
+
+        if (p1 > p2) {
+            player1Cards.add(p1)
+            player1Cards.add(p2)
         } else {
-            val buses = line.split(",")
-            var minValue = 0L
-            var runningProduct = 1L
-            for ((index2, bus) in buses.withIndex()) {
-                if (bus != "x") {
-                    val intBus = bus.toInt()
-                    while ((minValue + index2) % intBus != 0L) {
-                        minValue += runningProduct
-                    }
-                    runningProduct *= intBus
-                }
-            }
-            println(minValue)
+            player2Cards.add(p2)
+            player2Cards.add(p1)
+        }
+
+        rounds++
+        if (player1Cards.isEmpty() || player2Cards.isEmpty()) {
+            winner = true
         }
     }
+    var result = 0
+    if (player1Cards.isEmpty()) {
+       for ((index, c) in player2Cards.reversed().withIndex()) {
+          result += c * (index + 1)
+       }
+    }
+    if (player2Cards.isEmpty()) {
+       for ((index, c) in player1Cards.reversed().withIndex()) {
+          result += c * (index + 1)
+       }
+    }
+
+    println("Rounds: $rounds, Result: $result")
 }
 
