@@ -26,28 +26,6 @@ fun main(args: Array<String>) {
     for (path in tilePaths) {
         val c = Coord()
         for (d in path) {
-//            when (d) {
-//                "e" -> {
-//                    c.y--
-//                }
-//                "se" -> {
-//                    c.y--
-//                    c.x++
-//                }
-//                "sw" -> {
-//                    c.x--
-//                }
-//                "w" -> {
-//                    c.y++
-//                    c.x--
-//                }
-//                "nw" -> {
-//                    c.y++
-//                }
-//                "ne" -> {
-//                    c.x++
-//                }
-//            }
             when (d) {
                 "e" -> {
                    c.x++
