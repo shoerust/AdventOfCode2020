@@ -1,0 +1,240 @@
+Index: src/main/kotlin/main.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/kotlin/main.kt b/src/main/kotlin/main.kt
+--- a/src/main/kotlin/main.kt	(revision 0abcbef1f498cfd08de67abe6d3adc002fdf1805)
++++ b/src/main/kotlin/main.kt	(date 1608718217000)
+@@ -1,109 +1,90 @@
+ import java.io.File
+ 
++
+ fun main(args: Array<String>) {
+     println("Hello AdventOfCode2020!")
+ 
+     val fileName = "/Volumes/AsphyxiaSSD/development/advent1/src/main/resources/input.txt"
+     val lines: List<String> = File(fileName).readLines()
++    val indexByCup = mutableMapOf<Int, Int>()
+     val cups = mutableListOf<Int>()
+     for ((index, line) in lines.withIndex()) {
+-         for (c in line.toCharArray()) {
+-             cups.add(c.toString().toInt())
+-         }
+-    }
+-    var min = -1
+-    var max = -1
+-    var minIndex = 10000
+-    var maxIndex = -1
+-    for ((index, c) in cups.withIndex()) {
+-        if (c > max) {
+-            max = c
+-            maxIndex = index
++        for ((i, c) in line.toCharArray().withIndex()) {
++            indexByCup[c.toString().toInt()] = i
++            cups.add(c.toString().toInt())
+         }
+-        if (c < min) {
+-            min = c
+-            minIndex = index
+-        }
+     }
++//    for (i in 10..1000000) {
++//        cupByIndex[i] = i
++//        indexByCup[i] = i
++//    }
++    var min = 1
++    var max = 1000000
++    var minIndex = 0
++    var maxIndex = 999999
+ 
+-    println(cups)
+     var move = 0
+     var currIndex = 0
+-    while (move < 100) {
+-        //println("Curr index: $currIndex")
++    while (move < 10) {
++        println("Curr index: $currIndex")
+         val currentCup = cups[currIndex]
+         println("Curr cup: $currentCup")
++        println("printCup: $cups")
+ 
+-       val selection = mutableListOf<Int>()
++        val selection = mutableListOf<Int>()
+         for (c in 1..3) {
+             var d = currIndex + c
+-            if (d >= cups.size) {
+-                d -= cups.size
++            if (d >= indexByCup.size) {
++                d -= indexByCup.size
+             }
+             selection.add(cups[d])
+-        }
+-        
+-        for (c in 0..2) {
+-            cups.remove(selection[c])
++            indexByCup[cups[d]] = -1
+         }
+ 
+         println("Selection: $selection")
+-        println("Remaining: $cups")
+-        min = 100000
+-        max = -1
+-        minIndex = 10000
+-        maxIndex = -1
+-        for ((index, c) in cups.withIndex()) {
+-            if (c > max) {
+-                max = c
+-                maxIndex = index
+-            }
+-            if (c < min) {
+-                min = c
+-                minIndex = index
+-            }
+-        }
+-        var dest = -1
+-        var destIndex = -1
++
++        var destCup = -1
++        var destIndex = -2
++        var testCup = currentCup
+         var diff = 1
+-        while (dest == -1) {
+-            for ((index, c) in cups.withIndex()) {
+-                if (c == currentCup - diff) {
+-                    dest = c
+-                    destIndex = index
+-                    break
+-                }
++        while (destCup == -1) {
++            testCup -= diff
++            if (testCup <= 0) {
++                testCup += indexByCup.size
++                diff = 0
+             }
+-            if (dest == -1) {
+-                diff++
+-                if (currentCup - diff < min) {
+-                    for ((index, c) in cups.withIndex()) {
+-                        if (c > dest) {
+-                            dest = c
+-                            destIndex = index
+-                        }
+-                    }
+-                }
+-            }
++            diff++
++            destIndex = indexByCup[testCup]!!
++            if (destIndex > -1) {
++                destCup = testCup
++                break
++            }
++        }
++
++
++        var newDestIndex = indexByCup[destCup]!! - 3
++        if (newDestIndex <= 0) {
++            newDestIndex += indexByCup.size
+         }
+-        println("Dest: $dest")
++        indexByCup[destCup] = newDestIndex
+ 
+         var part1 = mutableListOf<Int>()
+-        for ((index, c) in selection.withIndex()) {
+-            cups.add(destIndex+index+1, c)
++        for ((index, i) in selection.withIndex()) {
++            indexByCup[i] = newDestIndex + index + 1
+         }
+-        println(cups)
++        for (pair in indexByCup) {
++            cups[pair.value] = pair.key
++        }
+         move++
+-        for ((index, c) in cups.withIndex()) {
+-           if (c == currentCup) {
+-               currIndex = index + 1
+-           }
+-        }
+-
+-        if (currIndex == cups.size) {
++        currIndex++
++        if (currIndex == indexByCup.size) {
+             currIndex = 0
+         }
++        println(move)
+     }
+     //24987653
++    var oneIndex = indexByCup[1]!!
++    println(cups[oneIndex + 1])
++    println(cups[oneIndex + 2])
+ }
+ 
+Index: src/main/resources/input.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/resources/input.txt b/src/main/resources/input.txt
+--- a/src/main/resources/input.txt	(revision 0abcbef1f498cfd08de67abe6d3adc002fdf1805)
++++ b/src/main/resources/input.txt	(date 1608718217000)
+@@ -1,1 +1,1 @@
+-583976241
+\ No newline at end of file
++389125467
+\ No newline at end of file
+diff --git a/out/production/advent1/MainKt.class b/out/production/advent1/MainKt.class
+index 9ef245ec6672fa57f6e3ca9ad18edd87fc2d4b88..9ef245ec6672fa57f6e3ca9ad18edd87fc2d4b88
+GIT binary patch
+literal 4809
+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
+Q!NI75p!ejz-@(|w0SA&m&Hw-a
+

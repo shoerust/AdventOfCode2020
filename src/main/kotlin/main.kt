@@ -5,105 +5,67 @@ fun main(args: Array<String>) {
 
     val fileName = "/Volumes/AsphyxiaSSD/development/advent1/src/main/resources/input.txt"
     val lines: List<String> = File(fileName).readLines()
-    val cups = mutableListOf<Int>()
+    val rightCupByCup = mutableMapOf<Int, Int>()
+    val max = 9
     for ((index, line) in lines.withIndex()) {
-         for (c in line.toCharArray()) {
-             cups.add(c.toString().toInt())
-         }
-    }
-    var min = -1
-    var max = -1
-    var minIndex = 10000
-    var maxIndex = -1
-    for ((index, c) in cups.withIndex()) {
-        if (c > max) {
-            max = c
-            maxIndex = index
+        var leftCup = -1
+        var firstCup = -1
+        for (c in line.toCharArray()) {
+            if (leftCup > -1) {
+                rightCupByCup[leftCup] = c.toString().toInt()
+            } else {
+                firstCup = c.toString().toInt()
+            }
+            leftCup = c.toString().toInt()
         }
-        if (c < min) {
-            min = c
-            minIndex = index
-        }
+        rightCupByCup[leftCup] = firstCup
     }
 
-    println(cups)
     var move = 0
-    var currIndex = 0
+    var currentCup = 3
     while (move < 100) {
-        //println("Curr index: $currIndex")
-        val currentCup = cups[currIndex]
-        println("Curr cup: $currentCup")
+        println(rightCupByCup.keys)
+        println(currentCup)
 
-       val selection = mutableListOf<Int>()
-        for (c in 1..3) {
-            var d = currIndex + c
-            if (d >= cups.size) {
-                d -= cups.size
-            }
-            selection.add(cups[d])
-        }
-        
-        for (c in 0..2) {
-            cups.remove(selection[c])
-        }
+        val p1 = rightCupByCup[currentCup]!!
+        val p2 = rightCupByCup[p1]!!
+        val p3 = rightCupByCup[p2]!!
 
-        println("Selection: $selection")
-        println("Remaining: $cups")
-        min = 100000
-        max = -1
-        minIndex = 10000
-        maxIndex = -1
-        for ((index, c) in cups.withIndex()) {
-            if (c > max) {
-                max = c
-                maxIndex = index
-            }
-            if (c < min) {
-                min = c
-                minIndex = index
-            }
-        }
+        println("$p1 $p2 $p3")
+
         var dest = -1
-        var destIndex = -1
         var diff = 1
+        var candidate = currentCup - 1
         while (dest == -1) {
-            for ((index, c) in cups.withIndex()) {
-                if (c == currentCup - diff) {
-                    dest = c
-                    destIndex = index
-                    break
-                }
+            if (candidate == 0) {
+                candidate = max
             }
-            if (dest == -1) {
-                diff++
-                if (currentCup - diff < min) {
-                    for ((index, c) in cups.withIndex()) {
-                        if (c > dest) {
-                            dest = c
-                            destIndex = index
-                        }
-                    }
-                }
+            if (candidate != p1 && candidate != p2 && candidate != p3) {
+                dest = candidate
             }
+            candidate--
         }
-        println("Dest: $dest")
-
-        var part1 = mutableListOf<Int>()
-        for ((index, c) in selection.withIndex()) {
-            cups.add(destIndex+index+1, c)
-        }
-        println(cups)
+        println("Dest $dest")
+        val n = rightCupByCup[dest]!!
+        val l = rightCupByCup[p3]!!
+        rightCupByCup[dest] = p1
+        rightCupByCup[p1] = p2
+        rightCupByCup[p2] = p3
+        rightCupByCup[p3] = n
+        rightCupByCup[currentCup] = l
+        currentCup = l
         move++
-        for ((index, c) in cups.withIndex()) {
-           if (c == currentCup) {
-               currIndex = index + 1
-           }
-        }
-
-        if (currIndex == cups.size) {
-            currIndex = 0
+    }
+    var i = 1
+    var done = false
+    while (!done) {
+        i = rightCupByCup[i]!!
+        print(i)
+        if (i == 1) {
+            done = true
         }
     }
+    println("")
     //24987653
 }
 
