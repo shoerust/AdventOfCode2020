@@ -6,10 +6,10 @@ fun main(args: Array<String>) {
     val fileName = "/Volumes/AsphyxiaSSD/development/advent1/src/main/resources/input.txt"
     val lines: List<String> = File(fileName).readLines()
     val rightCupByCup = mutableMapOf<Int, Int>()
-    val max = 9
+    val max = 1000000
+    var leftCup = -1
+    var firstCup = -1
     for ((index, line) in lines.withIndex()) {
-        var leftCup = -1
-        var firstCup = -1
         for (c in line.toCharArray()) {
             if (leftCup > -1) {
                 rightCupByCup[leftCup] = c.toString().toInt()
@@ -18,20 +18,29 @@ fun main(args: Array<String>) {
             }
             leftCup = c.toString().toInt()
         }
-        rightCupByCup[leftCup] = firstCup
     }
 
+    for (i in 10..1000000) {
+        rightCupByCup[leftCup] = i
+        leftCup = i
+    }
+    rightCupByCup[leftCup] = firstCup
+
     var move = 0
-    var currentCup = 3
-    while (move < 100) {
-        println(rightCupByCup.keys)
-        println(currentCup)
+    var currentCup = 5
+    while (move < 10000000) {
+        //println(rightCupByCup.keys)
+        //println(currentCup)
+
+            if (move % 100000 == 0) {
+               //println("Move $move")
+            }
 
         val p1 = rightCupByCup[currentCup]!!
         val p2 = rightCupByCup[p1]!!
         val p3 = rightCupByCup[p2]!!
 
-        println("$p1 $p2 $p3")
+        //println("$p1 $p2 $p3")
 
         var dest = -1
         var diff = 1
@@ -45,7 +54,7 @@ fun main(args: Array<String>) {
             }
             candidate--
         }
-        println("Dest $dest")
+        //println("Dest $dest")
         val n = rightCupByCup[dest]!!
         val l = rightCupByCup[p3]!!
         rightCupByCup[dest] = p1
@@ -58,14 +67,17 @@ fun main(args: Array<String>) {
     }
     var i = 1
     var done = false
-    while (!done) {
-        i = rightCupByCup[i]!!
-        print(i)
-        if (i == 1) {
-            done = true
-        }
-    }
-    println("")
+//    while (!done) {
+//        i = rightCupByCup[i]!!
+//        print(" ")
+//        if (i == 1) {
+//            done = true
+//        }
+//    }
+    val t = rightCupByCup[1]!!
+    val t2 = rightCupByCup[t]!!
+    val result = t.toLong() * t2.toLong()
+    println("$t $t2 $result")
     //24987653
 }
 
