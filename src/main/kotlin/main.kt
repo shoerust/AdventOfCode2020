@@ -1,13 +1,14 @@
 import java.io.File
 
+
+var black = HashSet<Coord>()
 fun main(args: Array<String>) {
     println("Hello AdventOfCode2020!")
-
     val fileName = "/Volumes/AsphyxiaSSD/development/advent1/src/main/resources/input.txt"
     val lines: List<String> = File(fileName).readLines()
-    val tilePaths  = mutableListOf<List<String>>()
+    val tilePaths = mutableListOf<List<String>>()
     val directions = mutableListOf<String>("e", "se", "sw", "w", "nw", "ne")
-    val tiles = mutableMapOf<Coord, Tile>()
+
     for ((index, line) in lines.withIndex()) {
         var path = line
         val pathList = mutableListOf<String>()
@@ -15,7 +16,7 @@ fun main(args: Array<String>) {
             for (d in directions) {
                 if (path.startsWith(d)) {
                     pathList.add(d)
-                   path = path.removePrefix(d)
+                    path = path.removePrefix(d)
                 }
             }
         }
@@ -25,10 +26,10 @@ fun main(args: Array<String>) {
 
     for (path in tilePaths) {
         val c = Coord()
-        for (d in path) {
+        for ((index, d) in path.withIndex()) {
             when (d) {
                 "e" -> {
-                   c.x++
+                    c.x++
                     c.y--
                 }
                 "se" -> {
@@ -36,15 +37,15 @@ fun main(args: Array<String>) {
                     c.y--
                 }
                 "sw" -> {
-                   c.x--
-                   c.z++
+                    c.x--
+                    c.z++
                 }
                 "w" -> {
-                   c.x--
+                    c.x--
                     c.y++
                 }
                 "nw" -> {
-                   c.z--
+                    c.z--
                     c.y++
                 }
                 "ne" -> {
@@ -53,35 +54,216 @@ fun main(args: Array<String>) {
                 }
             }
         }
-        if (tiles.containsKey(c)) {
-            val tile = tiles[c]!!
-            if (tile.colour == "white") {
-                tile.colour = "black"
-            } else {
-                tile.colour = "white"
-            }
-            tiles[c] = tile
+        if (black.contains(c)) {
+            black.remove(c)
         } else {
-            val t = Tile()
-            t.colour = "black"
-            tiles[c] = t
+            black.add(c)
         }
     }
 
-    var counter = 0
-    for ((c, v) in tiles) {
-        if (v.colour == "black") {
-            counter++
+    println(black.size)
+
+    println("part 2-----")
+
+    var day = 1
+    while (day <= 100) {
+        val eval = HashSet<Coord>()
+        eval.addAll(black)
+        val newBlack = HashSet<Coord>()
+        for (coord in black) {
+            val r = adjacent(coord)
+            eval.addAll(r)
         }
+        for (c in eval) {
+            val r = check(c)
+            if (black.contains(c) && (r == 1 || r == 2)) {
+                newBlack.add(c)
+            }
+            if (!black.contains(c) && r == 2) {
+                newBlack.add(c)
+            }
+        }
+        println("Day $day black: ${newBlack.size}")
+        black = newBlack
+
+        day++
     }
-    println(tiles)
-    println("black $counter")
+}
+
+fun adjacent(c: Coord): Set<Coord> {
+
+    var check = Coord()
+    val tilesToAdd = HashSet<Coord>()
+    check.x = c.x
+    check.y = c.y
+    check.z = c.z
+
+    //s
+    check.x++
+    check.y--
+
+    tilesToAdd.add(check)
+
+    check = Coord()
+
+    check.x = c.x
+    check.y = c.y
+    check.z = c.z
+
+    //nw
+    check.z++
+    check.y--
+
+    tilesToAdd.add(check)
+
+    check = Coord()
+
+    check.x = c.x
+    check.y = c.y
+    check.z = c.z
+
+    //sw
+    check.x--
+    check.z++
+
+    tilesToAdd.add(check)
+
+    check = Coord()
+
+    check.x = c.x
+    check.y = c.y
+    check.z = c.z
+
+    //w
+    check.x--
+    check.y++
+
+    tilesToAdd.add(check)
+
+    check = Coord()
+
+    check.x = c.x
+    check.y = c.y
+    check.z = c.z
+
+    //nw
+    check.z--
+    check.y++
+
+    tilesToAdd.add(check)
+
+    check = Coord()
+    check.x = c.x
+    check.y = c.y
+    check.z = c.z
+
+    //ne"
+    check.x++
+    check.z--
+
+    tilesToAdd.add(check)
+
+    return tilesToAdd
+
+}
+
+fun check(c: Coord): Int {
+    var cc = 0
+    var check = Coord()
+    check.x = c.x
+    check.y = c.y
+    check.z = c.z
+
+    //s
+    check.x++
+    check.y--
+
+    if (black.contains(check)) {
+        cc++
+    }
+
+    check = Coord()
+
+    check.x = c.x
+    check.y = c.y
+    check.z = c.z
+
+    //nw
+    check.z++
+    check.y--
+
+    if (black.contains(check)) {
+        cc++
+    }
+
+    check = Coord()
+
+    check.x = c.x
+    check.y = c.y
+    check.z = c.z
+
+    //sw
+    check.x--
+    check.z++
+
+    if (black.contains(check)) {
+        cc++
+    }
+
+    check = Coord()
+
+    check.x = c.x
+    check.y = c.y
+    check.z = c.z
+
+    //w
+    check.x--
+    check.y++
+
+    if (black.contains(check)) {
+        cc++
+    }
+
+    check = Coord()
+
+    check.x = c.x
+    check.y = c.y
+    check.z = c.z
+
+    //nw
+    check.z--
+    check.y++
+
+    if (black.contains(check)) {
+        cc++
+    }
+
+    check = Coord()
+
+    check.x = c.x
+    check.y = c.y
+    check.z = c.z
+
+    //ne"
+    check.x++
+    check.z--
+
+    if (black.contains(check)) {
+        cc++
+    }
+
+    return cc
+
 }
 
 class Coord {
     var x = 0
     var y = 0
     var z = 0
+    override fun toString(): String {
+        return "Coord(x=$x, y=$y, z=$z)"
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -100,19 +282,6 @@ class Coord {
         result = 31 * result + y
         result = 31 * result + z
         return result
-    }
-
-    override fun toString(): String {
-        return "Coord(x=$x, y=$y, z=$z)"
-    }
-
-
-}
-
-class Tile {
-    var colour = "white"
-    override fun toString(): String {
-        return "Tile(colour='$colour')"
     }
 }
 
